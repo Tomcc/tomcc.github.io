@@ -1,0 +1,18 @@
+---
+layout: default
+---
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        {% for post in site.posts limit: 10 %}
+        <h1>{{ post.title }}</h1>
+        <p><i>{{ post.date | date_to_long_string }}</i></p>
+        {{ post.excerpt }}
+        <p>
+          <a href="{{ post.url }}">Read Post >></a>
+        </p>
+        <hr>
+        {% endfor %}
+      </section>
+    </div>

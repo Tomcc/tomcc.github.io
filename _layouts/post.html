@@ -1,0 +1,21 @@
+{% include header.html %}
+    
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>{{ page.title }}</h1>
+        <p><i>{{ page.date | date_to_long_string }}</i></p>
+        {{ content }}
+        <p>
+          <a href="/index.html"><< Back to index</a>
+        </p>
+      </section>
+    </div>
+
+	<script>
+var c = document.getElementById("myCanvas");
+var ctx = c.getContext("2d");
+ctx.fillStyle = "#FF0000";
+ctx.fillRect(0,0,150,75);
+	</script>
+
+{% include footer.html %}
