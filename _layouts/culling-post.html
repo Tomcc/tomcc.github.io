@@ -3,12 +3,13 @@
 {% include post-content.html %}
 
 <img id="stone" src="/images/stone.png" style="display:none">
+<img id="grass" src="/images/grass.png" style="display:none">
 
 <script>
 
 var canvas = document.getElementById("example1");
 var stoneTex = document.getElementById("stone");
-var dirtTex = document.getElementById("dirt");
+var grassTex = document.getElementById("grass");
 var ctx = canvas.getContext("2d");
 
 var sx = Math.floor((canvas.width) / 16);
@@ -20,22 +21,22 @@ var startingPoints = [{x:0,y:0}, {x:0,y:1}, {x:0,y:2}, {x:0,y:3}, {x:0,y:4}, {x:
 
 var grid = 
 [
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+	1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,
+	1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,
+	0,0,0,0,0,0,1,1,1,1,1,1,0,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,
 ];
 
 var faceVisibility = 
@@ -50,6 +51,7 @@ var faceVisibility =
 
 var floodColors = 
 [
+	"#FFFFFF",
 	"#DB7D3E",
 	"#B350BC",
 	"#6B8AC9",
@@ -67,25 +69,37 @@ var floodColors =
 	"#191616"
 ]
 
+updateVisibility();
 redraw();
 
 function idx(x,y) {
 	return x + y * 16;
 }
 
-function drawCell(x,y, val) {
+function drawCellBackground(x,y) {
 	var val = grid[idx(x,y)];
 	if(val == 0) {
-		ctx.drawImage(stoneTex,x*sx+1,y*sy+1,sx,sy);
+		ctx.fillStyle = "#333333";
+		ctx.fillRect(x*sx-2,y*sy-2,sx+4,sy+4);
 	}
 	else {
 
 		if(val == 1)
 			ctx.fillStyle = "#111111";
 		else
-			ctx.fillStyle = floodColors[val % floodColors.length];
-		
-		ctx.fillRect(x*sx + 2,y*sy + 2,sx -2,sy-2);
+			ctx.fillStyle = floodColors[(val-2) % floodColors.length];
+
+		ctx.fillRect(x*sx,y*sy,sx,sy);
+	}
+}
+
+function drawCell(x,y) {
+	var val = grid[idx(x,y)];
+	if(val == 0) {
+		ctx.drawImage(stoneTex,x*sx+3,y*sy+3,sx+1,sy+1);
+	}
+	else {
+		ctx.drawImage(grassTex,x*sx+2,y*sy+2,sx-2,sy-2);
 	}
 }
 
@@ -93,6 +107,13 @@ function drawCell(x,y, val) {
 function redraw() {
 
 	ctx.clearRect(0,0,canvas.width, canvas.height);
+
+	for( var x = 0; x < 16; ++x ) {
+		for( var y = 0; y < 16; ++y ) {
+			var idx = x + y * 16;
+			drawCellBackground(x,y);
+		}
+	}
 
 	for( var x = 0; x < 16; ++x ) {
 		for( var y = 0; y < 16; ++y ) {
@@ -106,19 +127,33 @@ function redraw() {
 //	ctx.fillText("Sample String", 10, 50);
 }
 
-var hasFlooded = false;
 var floodID;
+var touchedByFlood = {};
+var toReplace = 1;
 
 function floodFill(x,y) {
 
-	if(x < 0 || y < 0 || x >= 16 || y >= 16 )
+	if(x < 0) {
+		touchedByFlood[0] = true;
 		return;
+	}
+	else if(x > 15){
+		touchedByFlood[1] = true;
+		return;
+	}
+	else if(y < 0){
+		touchedByFlood[2] = true;
+		return;
+	}
+	else if(y > 15){
+		touchedByFlood[3] = true;
+		return;
+	}
 
 	var cur = grid[idx(x,y)];
 
-	if(cur == 1) {
+	if(cur == toReplace) {
 		grid[idx(x,y)] = floodID;
-		hasFlooded = true;
 
 		floodFill(x+1,y);
 		floodFill(x-1,y);
@@ -141,11 +176,20 @@ function updateVisibility() {
 	for( var i = 0; i < startingPoints.length; ++i ) {
 		var p = startingPoints[i];
 
-		hasFlooded = false;
+		toReplace = 1;
+		touchedByFlood = {};
 		floodFill(p.x,p.y);
 
-		if(hasFlooded)
+		if(Object.keys(touchedByFlood).length > 1) // it did actually touch something
 			floodID++;
+		else {
+			//it failed
+			toReplace = floodID;
+			floodID = 1;
+			floodFill(p.x, p.y);
+			floodID = toReplace;
+		}
+
 	}
 }
 

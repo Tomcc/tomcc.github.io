@@ -64,7 +64,7 @@ Try to place/remove opaque blocks in this javascript thing here to see how it wo
 <canvas id="example1" width="610" height="610"
 style="border:1px solid #000000;">
 </canvas>
->*each color represents a different flood fill, dark tiles are unreachable from outside*
+>*each color represents a different flood fill, dark tiles don't lead anywhere*
 
 Putting it all together
 -----------
