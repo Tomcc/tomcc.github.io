@@ -3,13 +3,11 @@
 {% include post-content.html %}
 
 <img id="stone" src="/images/stone.png" style="display:none">
-<img id="grass" src="/images/grass.png" style="display:none">
 
 <script>
 
 var canvas = document.getElementById("example1");
-var stoneTex = document.getElementById("stone");
-var grassTex = document.getElementById("grass");
+var stoneTex = null;
 var ctx = canvas.getContext("2d");
 
 var sx = Math.floor((canvas.width) / 16);
@@ -53,7 +51,6 @@ var floodColors =
 [
 	"#FFFFFF",
 	"#DB7D3E",
-	"#B350BC",
 	"#6B8AC9",
 	"#B1A627",
 	"#41AE38",
@@ -66,11 +63,16 @@ var floodColors =
 	"#4F321F",
 	"#35461B",
 	"#963430",
-	"#191616"
+	"#191616",
+	"#B350BC"
 ]
 
-updateVisibility();
-redraw();
+window.onload=function(){
+	stoneTex = document.getElementById("stone");
+
+	updateVisibility();
+	redraw();	
+};
 
 function idx(x,y) {
 	return x + y * 16;
@@ -89,7 +91,7 @@ function drawCellBackground(x,y) {
 		else
 			ctx.fillStyle = floodColors[(val-2) % floodColors.length];
 
-		ctx.fillRect(x*sx,y*sy,sx,sy);
+		ctx.fillRect(x*sx,y*sy,sx-1,sy-1);
 	}
 }
 
@@ -99,12 +101,14 @@ function drawCell(x,y) {
 		ctx.drawImage(stoneTex,x*sx+3,y*sy+3,sx+1,sy+1);
 	}
 	else {
-		ctx.drawImage(grassTex,x*sx+2,y*sy+2,sx-2,sy-2);
+		//ctx.drawImage(grassTex,x*sx+2,y*sy+2,sx-2,sy-2);
 	}
 }
 
 
 function redraw() {
+	if(stoneTex == null)
+		return;
 
 	ctx.clearRect(0,0,canvas.width, canvas.height);
 

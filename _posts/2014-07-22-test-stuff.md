@@ -59,7 +59,7 @@ It's rather easy to build the connectivity graph for a chunk, it follows a simpl
 * every time the flood fill tries to exit the boundaries of the chunk through a face, add the face to the set
 * when the flood fill is done, connect together all the faces that were added to the set.
 
-Try to place/remove opaque blocks in this javascript thing here to see how it works in practice:  
+Try to place/remove opaque blocks in this javascript thing here to see how it would work in practice in a 2D chunk:  
 
 <canvas id="example1" width="610" height="610"
 style="border:1px solid #000000;">
