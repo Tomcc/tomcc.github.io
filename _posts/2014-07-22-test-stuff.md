@@ -1,9 +1,15 @@
 ---
 layout: culling-post
-title: The Advanced Cave Visibility Culling Algorithm™
+title: The Advanced Cave Culling Algorithm™, or, making Minecraft faster
 ---
 
-The Advanced Cave Culling Algorithm™ is a algorithm that I happened to come up with during the development of MCPE 0.9, when I tried to enable cave generation in the worlds.
+The Advanced Cave Culling Algorithm™ is a algorithm that I happened to come up with during the development of MCPE 0.9, after we tried to enable cave generation in the worlds and being stumped by how massively slower the game just became - it would hardly reach 40 fps on this-year devices!  
+Fortunately, turns out this culling works pretty great with pretty good culling ratios going from **50%** to **99%** (yes, 99%!) of the geometry, so it allowed us to generate caves on all phones instead than on the most powerful ones only.  
+On top of that, it gave a nice speed boost to Minecraft PC after it was backported :)  
+I think it might be an interesting read, and perhaps it could be useful to the countless voxels games being developed, so here's how it works!
+
+Yeah, Caves are kind of slow
+----
 
 Minecraft's caves are really fun to explore and get lost in thanks to their generated sponge-like structure and huge walkable area, and they have always been a part of Minecraft we wanted to bring over to MCPE.  
 However, while they are pretty cool for the gameplay, they are the ultimate [overdraw](http://en.wikipedia.org/wiki/Fillrate) nightmare:  
@@ -12,9 +18,13 @@ However, while they are pretty cool for the gameplay, they are the ultimate [ove
 * visible from potentially everywhere
 * they form a ton of overlapping planes
 
+<img src="/images/cull_before.jpg" width="830" height="509">
+
+> *the overdraw here is insane*
+
 While all this mess of overlapping polygons wastes a lot of rendering time on desktop PCs too, it's an even worse problem on **tile-deferred** rendering architectures such as those in mobile phones, for a bunch of quite low-level reasons.
 
-**Tile-deferred GPUs**, in short, have to keep a list of fragments for each framebuffer pixel in order to perform efficient Hidden Surface Removal; this works very well in simple scenes, but the amount of fragment per pixel in a typical cave scene in Minecraft is far too huge (peaks of hundreds of triangles rendered to the same pixel), and has an obvious impact over performance.
+**Tile-deferred GPUs** like the ones in mobile phones, in short, have to keep a list of fragments for each framebuffer pixel in order to perform efficient Hidden Surface Removal. This works very well in simple scenes, but the amount of fragments per pixel in a typical cave scene in Minecraft is far too huge (peaks of hundreds of triangles rendered to the same pixel), and has an obvious impact over performance.
 In benchmarks with caves on, even the latest iPad Mini 2013 couldn’t manage to render above 40 fps, while other slightly older devices such as the iPad Mini/iPad 2 struggled keeping a playable framerate.
 
 To make caves doable at all, then, we definitely needed a way to hide them when they are not needed, thus reducing the most-evil ovedraw... but it had to be a new approach, as we already explored a couple that didn't really cut it:
@@ -66,6 +76,46 @@ style="border:1px solid #000000;">
 </canvas>
 >*each color represents a different flood fill, dark tiles don't lead anywhere*
 
-Putting it all together
+Traversing the graph
 -----------
+
+Now that the visibility graph is done, it's time to start thinking how to use it to decide what we're going to show on screen, and this is where stuff starts to be harder to explain :)  
+Probably there are many ways to use the information we have right now, but they all hinge on the same speed/accuracy trade off: if we were going for the best accuracy, the best method would be of course to **raycast** each corner of each chunk in the frustum.  
+The visibility info we computed above still helps a lot with rays, as we can easily find out the faces they enter/exit a chunk from, and then use our canned visibility to continue or stop.  
+However, this is kinda not fast- at max render distance we have thousands of chunks loaded in the area around the player (17000 is not uncommon on PC!) and each chunk needs 7 raycasts at most - even if we would get the maximum culling ratio, running 119.000 raycasts per frame is not going to make the game any faster and wouldn't be an optimization at all, so something smarter was needed.  
+
+**Breadth-first searching**
+
+Instead, what I settled on was a simple [breadth-first search](http://en.wikipedia.org/wiki/Breadth-first_search), with some smart hacks.  
+If the chunks are stored in a contiguous 3D grid, the access time is O(1) and it's pretty fast in practice; plus, the BFS has a nice additional benefit: it visits the chunks front-to-back naturally, letting the GPU's Hidden Surface Removal powers shine.  
+
+In fact, the two main time-sinks we had on the CPU side in MCPE 0.8 and PC were **frustum culling** and **depth sorting**; their total accounted for around 14% of the frame time on both versions. Plus, the sorting on PC was notoriously bad and unresponsive (holes in the world, anyone?).  
+The BFS algorithm solves both of them in linear time, and on top of that we get the visibility culling we were looking for!
+
+So now, here's roughly how it works:
+* set up a queue of steps, where each step contains the **chunk** we want to visit next and the **face** we came from
+* put the chunk the camera is inside of as the first step
+* until the queue is empty, 
+* the first chunk is visited, put on the rendering queue, and popped; 
+* for each of its neighbors, we check if we need to walk there by applying some **filters** to the neighbor:  
+    1. first, check if we are going back. We never want to go back because if a chunk is only reachable by going backwards, it's not going to be visible. So, we only walk through faces opposite to the view vector, ```N·V < 0```. 
+    2. this is the key filter! We have 3 chunks now going around: **A**, the one we came from; **B**, the one we're inside, and **C**, the one we want to visit next. If we can *reach C from A through B* (reading into B's visibility graph), C passes this visibility test!
+    3. check if C passes even more filters (more on that later).
+    4. frustum cull C. Yes, frustum culling the most expensive operation here, so it's done as the last step.
+    5. if all of the above have been passed, queue this neighbor for visiting: it'll become eventually visible!
+
+Phew. That was a lot of text, but you can play around with this other javascript thing to see it in action:
+
+MAGIC JAVASCRIPT THING 2
+
+Moar filters!
+----
+
+Conclusions
+----
+
+<img src="/images/cull_after.jpg" width="830" height="509">
+> *Notice how much stuff disappeared!*
+
+
 
