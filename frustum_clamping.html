@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Blogblog" />
+
+    <title>I dunno lols</title>
+  </head>
+
+  <body>
+
+	<canvas id="example1" width="1400" height="900"
+	style="border:1px solid #000000;">
+	</canvas>
+
+	<script>
+		function toRad(ø) {
+			return ø / 180 * Math.PI;
+		}
+
+		var W = 32;
+		var H = 20;
+
+		var canvas = document.getElementById("example1");
+		var ctx = canvas.getContext("2d");
+
+		var sx = Math.floor((canvas.width) / W);
+		var sy = Math.floor((canvas.height) / H);
+
+
+		var grid = [];		
+		for( var i = 0; i < W*H; ++i )
+			grid[i] = 1;
+
+		var posX = null;
+		var posY = null;
+
+		var startX = 2;
+		var startY = H/2;
+		var fx = sx*startX;
+		var fy = sy*startY + sy/2;
+
+		var fMaxAlpha = toRad(70/2);
+		var fMinAlpha = -toRad(70/2);
+
+		visitCell( startX, startY );
+
+		redraw();
+
+		function isNear(x,y,x1,y1) {
+			return Math.abs(x1-x) + Math.abs(y1-y) == 1;
+		}
+
+		function idx(x,y) {
+			return x + y * W;
+		}
+
+		function drawCellBackground(x,y) {
+			var val = grid[idx(x,y)];
+			if(val == 0) {
+				ctx.fillStyle = "#333333";
+				ctx.fillRect(x*sx-2,y*sy-2,sx+4,sy+4);
+			}
+			else {
+
+				if(val == 1)
+					ctx.fillStyle = "#FFFFFF";
+				else
+					ctx.fillStyle = floodColors[(val-2) % floodColors.length];
+
+				ctx.fillRect(x*sx,y*sy,sx-1,sy-1);
+			}
+		}
+
+		function drawCell(x,y) {
+			var val = grid[idx(x,y)];
+			if(val == 0) {
+				ctx.fillStyle = "#111111";
+				ctx.fillRect(x*sx,y*sy,sx-1,sy-1);
+			}
+			else {
+				//ctx.drawImage(grassTex,x*sx+2,y*sy+2,sx-2,sy-2);
+			}
+		}
+
+		function angleTo(x, y) {
+			return Math.atan2(y-fy, x-fx);
+		}
+
+		function clipFrustumWithCell(x,y) {
+			var minx = x*sx;
+			var miny = y*sy;
+			var maxx = minx + sx;
+			var maxy = miny + sy;
+
+			var alphas = [
+				angleTo(minx,miny),
+				angleTo(minx,maxy),
+				angleTo(maxx,miny),
+				angleTo(maxx,maxy)
+			];
+
+			var min = Math.max( fMinAlpha, Math.min.apply(null, alphas) );
+			var max = Math.min( fMaxAlpha, Math.max.apply(null, alphas) );
+
+			if(min < max) {
+				fMaxAlpha = max;
+				fMinAlpha = min;
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		function redraw() {
+
+			ctx.clearRect(0,0,canvas.width, canvas.height);
+
+			for( var x = 0; x < W; ++x ) {
+				for( var y = 0; y < H; ++y ) {
+					var idx = x + y * W;
+					drawCellBackground(x,y);
+				}
+			}
+
+			for( var x = 0; x < W; ++x ) {
+				for( var y = 0; y < H; ++y ) {
+					drawCell(x,y);
+				}
+			}
+
+			var len = Math.sqrt(canvas.width*canvas.width + canvas.height*canvas.height);
+
+			//frustum
+			ctx.fillStyle = "rgba(255,255,1,0.3)";
+		    ctx.beginPath();
+		    ctx.moveTo(fx, fy);
+		    ctx.lineTo( fx + Math.cos(fMaxAlpha) * len, fy + Math.sin(fMaxAlpha) * len );
+		    ctx.lineTo( fx + Math.cos(fMinAlpha) * len, fy + Math.sin(fMinAlpha) * len );
+		    ctx.closePath();
+		    ctx.fill();
+
+
+		//	ctx.fillStyle = "#000000";
+		//	ctx.font = "20pt Arial";
+		//	ctx.fillText("Sample String", 10, 50);
+		}
+
+		function visitCell(x,y) {
+			var old = grid[idx(x,y)];
+			
+			var near = (posX == null && posY == null) || isNear(posX, posY, x, y);
+			if(old == 1 && near) {
+
+				if(posX != null && posY != null)
+					if( !clipFrustumWithCell(x,y) )
+						return;
+
+				grid[idx(x,y)] = 0;
+
+				posX = x;
+				posY = y;
+
+
+				redraw();
+			}
+		}
+
+		function clickCell(pos) {
+
+			var x = Math.floor(pos.x / canvas.width * W);
+			var y = Math.floor(pos.y / canvas.height * H);
+			
+			visitCell(x,y);
+		}
+
+		function getMousePos(canvas, evt) {
+		    var rect = canvas.getBoundingClientRect();
+		    return {
+		      x: evt.clientX - rect.left,
+		      y: evt.clientY - rect.top
+		    };
+		  }
+
+		canvas.addEventListener('click',
+			function(event) {
+
+				clickCell( getMousePos(canvas, event) )
+			}
+			, false);
+
+	</script>
+
+  </body>
+</html>
