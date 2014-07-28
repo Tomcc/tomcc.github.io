@@ -1,3 +1,8 @@
+---
+layout: none
+title: Frustum clamping demo
+---
+
 <!DOCTYPE html>
 <html>
 
@@ -10,7 +15,9 @@
   </head>
 
   <body>
-
+  This is a prototype of an optimization in MCPE's culling code. Needs a fairly recent browser!<br>
+  Click on tiles next to black tiles to "propagate the visibility search" aka place black boxes.<br>
+  They can only be placed touching the yellow cone: it's the point of the thing!<br><br>
 	<canvas id="example1" width="1400" height="900"
 	style="border:1px solid #000000;">
 	</canvas>
@@ -57,23 +64,6 @@
 			return x + y * W;
 		}
 
-		function drawCellBackground(x,y) {
-			var val = grid[idx(x,y)];
-			if(val == 0) {
-				ctx.fillStyle = "#333333";
-				ctx.fillRect(x*sx-2,y*sy-2,sx+4,sy+4);
-			}
-			else {
-
-				if(val == 1)
-					ctx.fillStyle = "#FFFFFF";
-				else
-					ctx.fillStyle = floodColors[(val-2) % floodColors.length];
-
-				ctx.fillRect(x*sx,y*sy,sx-1,sy-1);
-			}
-		}
-
 		function drawCell(x,y) {
 			var val = grid[idx(x,y)];
 			if(val == 0) {
@@ -118,13 +108,6 @@
 		function redraw() {
 
 			ctx.clearRect(0,0,canvas.width, canvas.height);
-
-			for( var x = 0; x < W; ++x ) {
-				for( var y = 0; y < H; ++y ) {
-					var idx = x + y * W;
-					drawCellBackground(x,y);
-				}
-			}
 
 			for( var x = 0; x < W; ++x ) {
 				for( var y = 0; y < H; ++y ) {
