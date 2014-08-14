@@ -3,29 +3,29 @@ layout: culling-post
 title: The Advanced Cave Culling Algorithm™, or, making Minecraft faster
 ---
 
-The Advanced Cave Culling Algorithm™ is a algorithm that I happened to come up with during the development of MCPE 0.9, after we tried to enable cave generation in the worlds and being stumped by how massively slower the game just became - it would hardly reach 40 fps on this-year devices!  
-Fortunately, turns out this culling works pretty great with pretty good culling ratios going from **50%** to **99%** (yes, 99%!) of the geometry, so it allowed us to generate caves on all phones instead than on the most powerful ones only.  
+The Advanced Cave Culling Algorithm™ is an algorithm that I happened to come up with during the development of MCPE 0.9, after we tried to enable cave generation in the worlds and being hit by how slower the game just became - it would hardly reach 40 fps on this-year devices!  
+Fortunately, turns out this culling approach works pretty great with good culling ratios going from **50%** to **99%** (yes, 99%!) of the geometry, so it allowed us to generate caves on all phones instead than on the most powerful ones only.  
 On top of that, it gave a nice speed boost to Minecraft PC after it was backported :)  
 I think it might be an interesting read, and perhaps it could be useful to the countless voxels games being developed, so here's how it works!
 
-Yeah, Caves are kind of slow
+Yeah, caves are kind of slow
 ----
 
 Minecraft's caves are really fun to explore and get lost in thanks to their generated sponge-like structure and huge walkable area, and they have always been a part of Minecraft we wanted to bring over to MCPE.  
 However, while they are pretty cool for the gameplay, they are the ultimate [overdraw](http://en.wikipedia.org/wiki/Fillrate) nightmare:  
-* tessellating and rendering the caves and their surfaces requires a massive amount of triangles
+* rendering the caves by tessellating their surfaces requires a massive amount of triangles
 * they are really chaotic and twisted
 * visible from potentially everywhere
-* they form a ton of overlapping planes
+* they form a lot of overlapping surfaces (ie. polygons one in front of another)
 
 <img src="/images/cull_before.jpg" width="830" height="509">
 
-> *the overdraw here is insane*
+> *the overdraw here is insane!*
 
 While all this mess of overlapping polygons wastes a lot of rendering time on desktop PCs too, it's an even worse problem on **tile-deferred** rendering architectures such as those in mobile phones, for a bunch of quite low-level reasons.
 
-**Tile-deferred GPUs** like the ones in mobile phones, in short, have to keep a list of fragments for each framebuffer pixel in order to perform efficient Hidden Surface Removal. This works very well in simple scenes, but the amount of fragments per pixel in a typical cave scene in Minecraft is far too huge (peaks of hundreds of triangles rendered to the same pixel), and has an obvious impact over performance.
-In benchmarks with caves on, even the latest iPad Mini 2013 couldn’t manage to render above 40 fps, while other slightly older devices such as the iPad Mini/iPad 2 struggled keeping a playable framerate.
+**Tile-deferred GPUs** like the ones in mobile phones, from what I gathered, have to keep a list of fragments for each framebuffer pixel in order to perform efficient Hidden Surface Removal. This works very well in simple scenes, but makes the scene complexity proportional to the amount of fragments per pixel; in a typical cave scene in Minecraft is far too huge (peaks of hundreds of triangles rendered to the same pixel), and has an obvious impact over performance.
+In benchmarks with caves on, even the latest iPad Mini Retina couldn’t manage to render above 40 fps, while other slightly older devices such as the iPad Mini/iPad 2 struggled keeping a playable framerate.
 
 To make caves doable at all, then, we definitely needed a way to hide them when they are not needed, thus reducing the most-evil ovedraw... but it had to be a new approach, as we already explored a couple that didn't really cut it:
 
@@ -39,12 +39,13 @@ This works for some GPUs (desktop Nvidia variants, primarily) but unfortunately 
 That is, your GPU, at any time, lags from 1 to 3 frames *behind* what the CPU is doing right now.  
 So, without a lot of careful fiddling, rendering those hulls and reading back the result in the same frame can **stall the GPU** forcing it to stop and wait for the CPU.  
 Without the driver optimizations that Nvidia probably does, this is actually very slow.  
-And anyway HOQs are not available at all on phones, even today.
+And anyway HOQs are not available at all on phones, short of requiring OpenGL ES 3.0.
 
 **Checking which chunk faces are all opaque**  
 Okay, that's not really a name, but anyway.
-Some people (and me) thought of an algorithm that could run on the CPU simply checking which sides of the 16x16x16 chunks were completely filled up by opaque blocks, thus forming a wall we could check against: if a chunk was completely covered by those faces it would be safe to hide it.  
-However this too was a disappointment, though. It turns out that the caves are so damn all over the place that these walls of opaque blocks are quite rare: **only 1 in 100** chunks could actually be culled with this method.
+Some people (and me) thought of an algorithm that could run on the CPU simply checking which sides of the 16x16x16 chunks were completely filled up by opaque blocks, thus forming a wall we could check against.  
+If a chunk was completely covered by those faces it would be safe to hide it.  
+However this too was a disappointment, though. It turns out that the caves are so damn all over the place that these walls of opaque blocks are quite rare, and the chance of one chunk having 6 opaque sides is very low: **only 1 in 100** chunks could actually be culled with this method.
 
 Thinking quadrimensionally
 ----
@@ -63,7 +64,7 @@ This is actually a somewhat expensive operation (~0.1-0.2 ms on most devices I t
 Rebuilding the graph
 -----------
 
-It's rather easy to build the connectivity graph for a chunk, it follows a simple algorithm:
+It's rather straightforward to build the connectivity graph for a chunk, it follows a simple algorithm:
 * for each block that's not opaque,
 * start a 3D [flood fill](http://en.wikipedia.org/wiki/Flood_fill), with an empty set of faces
 * every time the flood fill tries to exit the boundaries of the chunk through a face, add the face to the set
@@ -89,17 +90,17 @@ However, this is kinda not fast- at max render distance we have thousands of chu
 Instead, what I settled on was a simple [breadth-first search](http://en.wikipedia.org/wiki/Breadth-first_search), with some smart hacks.  
 If the chunks are stored in a contiguous 3D grid, the access time is O(1) and it's pretty fast in practice; plus, the BFS has a nice additional benefit: it visits the chunks front-to-back naturally, letting the GPU's Hidden Surface Removal powers shine.  
 
-In fact, the two main time-sinks we had on the CPU side in MCPE 0.8 and PC were **frustum culling** and **depth sorting**; their total accounted for around 14% of the frame time on both versions. Plus, the sorting on PC was notoriously bad and unresponsive (holes in the world, anyone?).  
-The BFS algorithm solves both of them in linear time, and on top of that we get the visibility culling we were looking for!
+In fact, the three main time-sinks we had on the CPU side in MCPE 0.8 and PC were **frustum culling**, **depth sorting** and **rebuild scheduling**; their total accounted for around 14% of the frame time on both versions. Plus, the scheduling on PC was notoriously bad and unresponsive (holes in the world, anyone?).  
+The BFS algorithm solves allowed of them in linear time, and on top of that we get the visibility culling we were looking for!
 
-So now, here's roughly how it works:
+So now, here's roughly how it works, in a quite condensed way:
 * set up a queue of steps, where each step contains the **chunk** we want to visit next and the **face** we came from
-* put the chunk the camera is inside of as the first step
-* until the queue is empty, 
-* the first chunk is visited, put on the rendering queue, and popped; 
-* for each of its neighbors, we check if we need to walk there by applying some **filters** to the neighbor:  
-    1. first, check if we are going back. We never want to go back because if a chunk is only reachable by going backwards, it's not going to be visible. So, we only walk through faces opposite to the view vector, ```N·V < 0```. 
-    2. this is the key filter! We have 3 chunks now going around: **A**, the one we came from; **B**, the one we're inside, and **C**, the one we want to visit next. If we can *reach C from A through B* (reading into B's visibility graph), C passes this visibility test!
+* find chunk the camera is inside of and push it on the queue as the first step
+* for each chunk, until the queue is empty, 
+* the front chunk in the queue is visited, queued for rendering or for rebuilding, and popped; 
+* for each of its neighbors, we check if we need to walk there by applying some **filters** to them:  
+    1. first, check if we are going back. We never want to go back because if a chunk is only reachable going backwards, it's not going to be visible. So, we only walk through faces opposite to the view vector, ```N·V < 0```. 
+    2. this is the key filter! Now we have 3 chunks going around: **A**, the one we came from; **B**, the one we're inside, and **C**, the one we want to visit next. If we can *reach C from A through B* (reading into B's visibility graph), C passes this visibility test!
     3. check if C passes even more filters (more on that later).
     4. frustum cull C. Yes, frustum culling the most expensive operation here, so it's done as the last step.
     5. if all of the above have been passed, queue this neighbor for visiting: it'll become eventually visible!
@@ -108,11 +109,28 @@ Phew. That was a lot of text, but you can play around with this other javascript
 
 MAGIC JAVASCRIPT THING 2
 
-Moar filters!
+More filters!
 ----
+
+As you may have noticed if I actually succeded in explaining the algorithm, it has a flaw that can cause unpredictable under-culling, and thus, framerate drops.  
+Indeed, this problem is the technical reason that got us to cut Ravines from Pocket Edition, because they are always a worst case!  
+What happens is that there is nothing that prevents the BFS to walk, say, 10 chunks straight and then 7 chunks down to the bottom of a ravine, rendering everything in the process.  
+Visually, it's pretty obvious that the path doesn't approximate a raycast in the slightest because it has a huge bend in it, but the current implementation isn't smart enough to know... a ravine or a huge cave then, can cause *all caves* on the other side of it to be visible from certain angles!  
+
+**Count the steps**  
+To try and patch this problem, I've pulled in some info from what we know about the gameplay of Minecraft, coming up with heuristics about what should and should not be visible.  
+In other words, with our current terrain generation, the "common cave" bends a lot, exists under the sea level, and is fully unlit unless a player visits it; and because *of course* correlation implies causation, we can penalize chunks that have these attributes during the walk, because *of course* they contain caves!  
+The idea is to do this by adding a maximum **walkable steps** to the search, so that a branch passing through "bad" chunks will spend more steps and terminate earlier.  
+I've settled on using only two heuristics, that still are fairly effective: going down *when under sea level* costs +1 step, and walking through a fully-dark chunk a whopping +3.  
+
+This hackish thing, experimentally, contributes 5% to 15% of the cull ratio depending on the scene, and it manly smooths out huge caves that would pop into visibility if the search wasn't stopped earlier!  
+The bad news is that this doesn't do much at all for surface ravines, because their shape allows sunlight to reach the bottom. Oh well.  
+I've since solved this problem (in theory) with a way more effective and generic algorithm based on assigning an sub-frustum to each BFS step, but that will probably be for another article :)
 
 Conclusions
 ----
+
+It works! Here's a nice picture of the panorama on top after the culling is applied:
 
 <img src="/images/cull_after.jpg" width="830" height="509">
 > *Notice how much stuff disappeared!*
