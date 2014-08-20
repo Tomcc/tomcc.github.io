@@ -520,15 +520,15 @@
 	"buffers":
 	[
 		{
-			"file": "_includes/header.html",
+			"file": "/Users/tommaso/DEV/test.cpp",
 			"settings":
 			{
-				"buffer_size": 552,
+				"buffer_size": 838,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "0 0 2 0 \n0 0 0 0 \n2 0 0 0 \n0 0 0 0 \n[Finished in 0.1s]",
+			"contents": "0 0 0 0 \n2 0 0 0 \n0 0 0 0 \n0 0 2 0 \n[Finished in 0.1s]",
 			"settings":
 			{
 				"buffer_size": 54,
@@ -602,13 +602,21 @@
 	},
 	"file_history":
 	[
-		"/Users/tommaso/DEV/github_io/_includes/footer.html",
-		"/Users/tommaso/DEV/test.cpp",
-		"/Users/tommaso/DEV/2048.rs",
-		"/Users/tommaso/DEV/github_io/_layouts/culling-post.html",
+		"/Users/tommaso/Downloads/hqx-1.1/README",
+		"/Users/tommaso/Downloads/hqx-1.1/NEWS",
+		"/Users/tommaso/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
 		"/Users/tommaso/DEV/github_io/_posts/2014-07-22-test-stuff.md",
-		"/Users/tommaso/DEV/github_io/_config.yml",
+		"/Users/tommaso/Music/.localized",
+		"/usr/bin/minecraft_server",
+		"/Users/tommaso/DEV/2048.rs",
+		"/Users/tommaso/DEV/test.cpp",
+		"/Users/tommaso/Dropbox/minecraft_server/eula.txt",
+		"/Users/tommaso/DEV/Minecraftpe/handheld/src/client/renderer/LevelRenderer.cpp",
+		"/Users/tommaso/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
 		"/Users/tommaso/DEV/github_io/_includes/header.html",
+		"/Users/tommaso/DEV/github_io/_includes/footer.html",
+		"/Users/tommaso/DEV/github_io/_layouts/culling-post.html",
+		"/Users/tommaso/DEV/github_io/_config.yml",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src-deps/leveldb/db/c.cc",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src-deps/leveldb/db/zlib_compressor.cc",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src-deps/leveldb/Makefile",
@@ -665,7 +673,6 @@
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src/world/level/Level.cpp",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src/world/level/tile/LiquidTile.cpp",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src/world/level/TileSource.cpp",
-		"/Users/tommaso/DEV/Minecraftpe/handheld/src/client/renderer/LevelRenderer.cpp",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src/client/renderer/RenderChunk.cpp",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src/client/renderer/RenderChunk.h",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/lib/include/boost/range/rend.hpp",
@@ -722,14 +729,7 @@
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src/world/item/ClockItem.h",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src/client/gui/screens/ChooseLevelScreen.cpp",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src/common_header.h",
-		"/Users/tommaso/DEV/Minecraftpe/handheld/project/android/bin/local.properties",
-		"/Users/tommaso/DEV/Minecraftpe/handheld/src/client/gui/components/LoginOption.cpp",
-		"/Users/tommaso/DEV/Minecraftpe/handheld/src/client/renderer/GLBuffer.h",
-		"/Users/tommaso/DEV/Minecraftpe/handheld/src/client/gui/Gui.cpp",
-		"/Users/tommaso/DEV/Minecraftpe/handheld/src/AppContext_android.h",
-		"/Users/tommaso/DEV/Minecraftpe/handheld/project/android/jni/Application.mk",
-		"/Users/tommaso/DEV/Minecraftpe/handheld/src/AppPlatformListener.cpp",
-		"/Users/tommaso/DEV/Minecraftpe/handheld/src/network/packet/AddPlayerPacket.h"
+		"/Users/tommaso/DEV/Minecraftpe/handheld/project/android/bin/local.properties"
 	],
 	"find":
 	{
@@ -1017,32 +1017,31 @@
 			[
 				{
 					"buffer": 0,
-					"file": "_includes/header.html",
+					"file": "/Users/tommaso/DEV/test.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 552,
+						"buffer_size": 838,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								552,
-								552
+								225,
+								225
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 255.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -1075,7 +1074,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -1109,7 +1108,7 @@
 		"cols":
 		[
 			0.0,
-			0.5,
+			0.632961309524,
 			1.0
 		],
 		"rows":
@@ -1138,6 +1137,10 @@
 		"height": 0.0,
 		"selected_items":
 		[
+			[
+				"22",
+				"_posts/2014-07-22-test-stuff.md"
+			],
 			[
 				"foot",
 				"_includes/footer.html"
@@ -1225,10 +1228,6 @@
 			[
 				"index",
 				"index.html"
-			],
-			[
-				"22",
-				"_posts/2014-07-22-test-stuff.md"
 			],
 			[
 				"apppmm",
@@ -2055,7 +2054,7 @@
 	"show_minimap": true,
 	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": true,
+	"side_bar_visible": false,
 	"side_bar_width": 150.0,
 	"status_bar_visible": true,
 	"template_settings":
