@@ -4,17 +4,15 @@ title: The Advanced Cave Culling Algorithm™ Part 2 - Traversing the graph
 ---
 
 > *You can find the first part of the article [here](http://localhost:4000/2014/07/22/visibility.html)*.
-
 Now that we can build a visibility graph out of the cubic chunks, we need to find a way to search which ones are actually visible from the player's point of view!  
-Probably there are many ways to use the graph we have right now, but they all hinge on the same speed/accuracy trade off.
+Probably there are many ways to use the graph we have right now, but they all hinge on the same performance/accuracy trade off.
 
 **Raycasting (no, not really)**  
 If we were going for the best accuracy, the best method would be to **raycast** each corner of each chunk in the frustum.  
 The visibility info we computed above still helps a lot with rays, as we can easily find out the faces they enter/exit a chunk from, and then use our canned visibility to continue or stop.  
 However, this is kind of not fast- at max render distance we have thousands of chunks loaded in the area around the player (17.000 is not uncommon on PC!) and each chunk needs 7 raycasts at most - even if we would get the maximum culling ratio, running 119.000 raycasts per frame is not going to make the game any faster and wouldn't be an optimization at all, so something smarter was needed.  
 
-**Breadth-first searching**
-
+**Breadth-first searching**  
 Instead, what I settled on was a regular [breadth-first search](http://en.wikipedia.org/wiki/Breadth-first_search), with some hacks.  
 If the chunks are stored in a contiguous 3D grid, the access time is O(1) and it's pretty fast in practice; plus, the BFS has a nice additional benefit: it visits the chunks front-to-back naturally, letting the GPU's Hidden Surface Removal powers shine.  
 

@@ -32,6 +32,8 @@ h1, h2, h3, h4, h5, h6 {
   color:#222222;
   font-family: 'Lucida Grande', 'Calibri', Helvetica, Arial, sans-serif;
   letter-spacing: -1px;
+
+  text-shadow: 1px 1px #aaaaaa;
 }
 
 h1 {
@@ -235,7 +237,7 @@ Full-Width Styles
 }
 
 #header_wrap {
-  background: #212121;
+  background: url('../images/1km.jpg')  no-repeat 95% 50%;;
 }
 
 #header_wrap .inner {
@@ -247,7 +249,7 @@ Full-Width Styles
   color: #fff;
   font-size: 42px;
   font-weight: 700;
-  text-shadow: #111 0px 0px 10px;
+  text-shadow: 3px 3px #333333;
 }
 
 #project_tagline {
@@ -255,7 +257,7 @@ Full-Width Styles
   font-size: 24px;
   font-weight: 300;
   background: none;
-  text-shadow: #111 0px 0px 10px;
+  text-shadow: 3px 3px #333333;
 }
 
 #downloads {
