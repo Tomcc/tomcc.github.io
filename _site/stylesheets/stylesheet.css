@@ -17,6 +17,7 @@ Theme Styles
 }
 
 body {
+  text-align: justify;
   color:#373737;
   background: #212121;
   font-size: 18px;
@@ -108,10 +109,11 @@ img {
 p img {
   display: inline;
   margin: 0;
-  padding: 0;
-  vertical-align: middle;
+  padding: 0px;
+  vertical-align: center;
   text-align: center;
   border: none;
+  box-shadow: 3px 3px 1px #888888;
 }
 
 pre, code {
@@ -212,7 +214,7 @@ Full-Width Styles
 
 .inner {
   position: relative;
-  max-width: 640px;
+  max-width: 740px;
   padding: 20px 10px;
   margin: 0 auto;
 }
