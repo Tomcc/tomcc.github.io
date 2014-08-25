@@ -3,7 +3,7 @@ layout: culling-post
 title: The Advanced Cave Culling Algorithm™, or, making Minecraft faster
 ---
 
-The Advanced Cave Culling Algorithm™ is an algorithm that I happened to come up with during the development of MCPE 0.9, after we tried to enable cave generation in the worlds and being hit by how slower the game just became - it would hardly reach 40 fps on this-year devices!  
+The Advanced Cave Culling Algorithm™ is an algorithm that I happened to come up with during the development of MCPE 0.9, after we tried to enable cave generation in the worlds and being hit by how slower the game just became - it would hardly reach 40 fps on this year's devices!  
 Fortunately, turns out this culling approach works pretty great with good culling ratios going from **50%** to **99%** (yes, 99%!) of the geometry, so it allowed us to generate caves on all phones instead than on the most powerful ones only.  
 On top of that, it gave a nice speed boost to Minecraft PC after it was backported :)  
 I think it might be an interesting read, and perhaps it could be useful to the countless voxels games being developed, so here's how it works!
@@ -22,14 +22,14 @@ However, while they are pretty cool for the gameplay, they are the ultimate [ove
 
 > *the overdraw here is insane!*
 
-While all this mess of overlapping polygons wastes a lot of rendering time on desktop PCs too, it's an even worse problem on **tile-deferred** rendering architectures such as those in mobile phones, for a bunch of quite low-level reasons.
+While all of this mess of overlapping polygons wastes a lot of rendering time on desktop PCs too, the issue is even worse on **tile-deferred** rendering architectures such as those in mobile phones due to how they process the fragments.
 
-**Tile-deferred GPUs** like the ones in mobile phones, from what I gathered, have to keep a list of fragments for each framebuffer pixel in order to perform efficient Hidden Surface Removal. This works very well in simple scenes, but makes the scene complexity proportional to the amount of fragments per pixel; in a typical cave scene in Minecraft is far too huge (peaks of hundreds of triangles rendered to the same pixel), and has an obvious impact over performance.
+**Tile-deferred GPUs** like the PowerVR family found in Apple's devices can perform a very efficient Hidden Surface Removal, but at the cost of keeping track of a sorted list of screen pixels. This works very well in simple scenes, but the scene complexity becomes proportional to the amount of fragments per pixel; in a typical cave scene in Minecraft is far too huge (peaks of hundreds of triangles rendered to the same pixel), and has an obvious impact over performance.
 In benchmarks with caves on, even the latest iPad Mini Retina couldn’t manage to render above 40 fps, while other slightly older devices such as the iPad Mini/iPad 2 struggled keeping a playable framerate.
 
-To make caves doable at all, then, we definitely needed a way to hide them when they are not needed, thus reducing the most-evil ovedraw... but it had to be a new approach, as we already explored a couple that didn't really cut it:
+To make caves doable at all, then, we definitely needed a way to hide them when they are not needed, thus reducing the most evil ovedraw... but it had to be a new approach, as we already explored a couple that didn't really cut it:
 
-Stuff people tried before
+Things people tried before
 ----
 
 **Minecraft PC's Advanced OpenGL**  
@@ -39,13 +39,12 @@ This works for some GPUs (desktop Nvidia variants, primarily) but unfortunately 
 That is, your GPU, at any time, lags from 1 to 3 frames *behind* what the CPU is doing right now.  
 So, without a lot of careful fiddling, rendering those hulls and reading back the result in the same frame can **stall the GPU** forcing it to stop and wait for the CPU.  
 Without the driver optimizations that Nvidia probably does, this is actually very slow.  
-And anyway HOQs are not available at all on phones, short of requiring OpenGL ES 3.0.
+And anyway HOQs are only available on OpenGL ES 3.0 devices, which are already the fastest around.
 
 **Checking which chunk faces are all opaque**  
-Okay, that's not really a name, but anyway.
 Some people (and me) thought of an algorithm that could run on the CPU simply checking which sides of the 16x16x16 chunks were completely filled up by opaque blocks, thus forming a wall we could check against.  
 If a chunk was completely covered by those faces it would be safe to hide it.  
-However this too was a disappointment, though. It turns out that the caves are so damn all over the place that these walls of opaque blocks are quite rare, and the chance of one chunk having 6 opaque sides is very low: **only 1 in 100** chunks could actually be culled with this method.
+However this too was a disappointment, though. It turns out that the caves are so spread all over the place that these walls of opaque blocks are quite rare, and the chance of one chunk having 6 opaque sides is very low: only about 1 in 100 chunks could actually be culled with this method.
 
 Thinking quadrimensionally
 ----
@@ -64,7 +63,7 @@ This is actually a somewhat expensive operation (~0.1-0.2 ms on most devices I t
 Rebuilding the graph
 -----------
 
-It's rather straightforward to build the connectivity graph for a chunk, it follows a simple algorithm:
+It's rather straightforward to build the connectivity graph for a chunk when an opaque block changes, it follows a simple algorithm:
 * for each block that's not opaque,
 * start a 3D [flood fill](http://en.wikipedia.org/wiki/Flood_fill), with an empty set of faces
 * every time the flood fill tries to exit the boundaries of the chunk through a face, add the face to the set
@@ -78,5 +77,5 @@ style="border:1px solid #000000;">
 >*each color represents a different flood fill, dark tiles don't lead anywhere;  
 >the green lines tell which face can see which other.*
 
-Now that the chunks are all connected together through their visible faces, it's time to start thinking how to use this to decide what we're going to show on screen, and this is where stuff starts to be harder to explain.
-I'll try to explain how the visiblity graph is used in [Part 2](http://localhost:4000/2014/07/22/visibility-2.html), for all of those not already too bored :)
+After the chunks are all connected together through their visible faces, it's time to start thinking of how to use this to decide what we're going to show on screen, and this is where things start to be more interesting!  
+I'll try to explain how the visibility graph is used in [Part 2](http://localhost:4000/2014/07/22/visibility-2.html), for all of those not already too bored :)

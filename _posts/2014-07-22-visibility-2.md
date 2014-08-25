@@ -5,20 +5,23 @@ title: The Advanced Cave Culling Algorithm™ Part 2 - Traversing the graph
 
 > *You can find the first part of the article [here](http://localhost:4000/2014/07/22/visibility.html)*.
 
-Now that the visibility graph is done, it's time to start thinking how to use it to decide what we're going to show on screen, and this is where stuff starts to be harder to explain :)  
-Probably there are many ways to use the information we have right now, but they all hinge on the same speed/accuracy trade off: if we were going for the best accuracy, the best method would be of course to **raycast** each corner of each chunk in the frustum.  
+Now that we can build a visibility graph out of the cubic chunks, we need to find a way to search which ones are actually visible from the player's point of view!  
+Probably there are many ways to use the graph we have right now, but they all hinge on the same speed/accuracy trade off.
+
+**Raycasting (no, not really)**  
+If we were going for the best accuracy, the best method would be to **raycast** each corner of each chunk in the frustum.  
 The visibility info we computed above still helps a lot with rays, as we can easily find out the faces they enter/exit a chunk from, and then use our canned visibility to continue or stop.  
-However, this is kinda not fast- at max render distance we have thousands of chunks loaded in the area around the player (17000 is not uncommon on PC!) and each chunk needs 7 raycasts at most - even if we would get the maximum culling ratio, running 119.000 raycasts per frame is not going to make the game any faster and wouldn't be an optimization at all, so something smarter was needed.  
+However, this is kind of not fast- at max render distance we have thousands of chunks loaded in the area around the player (17.000 is not uncommon on PC!) and each chunk needs 7 raycasts at most - even if we would get the maximum culling ratio, running 119.000 raycasts per frame is not going to make the game any faster and wouldn't be an optimization at all, so something smarter was needed.  
 
 **Breadth-first searching**
 
-Instead, what I settled on was a simple [breadth-first search](http://en.wikipedia.org/wiki/Breadth-first_search), with some smart hacks.  
+Instead, what I settled on was a regular [breadth-first search](http://en.wikipedia.org/wiki/Breadth-first_search), with some hacks.  
 If the chunks are stored in a contiguous 3D grid, the access time is O(1) and it's pretty fast in practice; plus, the BFS has a nice additional benefit: it visits the chunks front-to-back naturally, letting the GPU's Hidden Surface Removal powers shine.  
 
 In fact, the three main time-sinks we had on the CPU side in MCPE 0.8 and PC were **frustum culling**, **depth sorting** and **rebuild scheduling**; their total accounted for around 14% of the frame time on both versions. Plus, the scheduling on PC was notoriously bad and unresponsive (holes in the world, anyone?).  
 The BFS algorithm solves allowed of them in linear time, and on top of that we get the visibility culling we were looking for!
 
-So now, here's roughly how it works, in a quite condensed way:
+So now, here's roughly how the visibility search works, in a quite condensed way:
 * set up a queue of steps, where each step contains the **chunk** we want to visit next and the **face** we came from
 * find chunk the camera is inside of and push it on the queue as the first step
 * for each chunk, until the queue is empty, 
@@ -50,7 +53,6 @@ I've settled on using only two heuristics, that still are fairly effective: goin
 
 This hackish thing, experimentally, contributes 5% to 15% of the cull ratio depending on the scene, and it manly smooths out huge caves that would pop into visibility if the search wasn't stopped earlier!  
 The bad news is that this doesn't do much at all for surface ravines, because their shape allows sunlight to reach the bottom. Oh well.  
-I've since solved this problem (in theory) with a way more effective and generic algorithm based on assigning an sub-frustum to each BFS step, but that will probably be for another article :)
 
 Conclusions
 ----
