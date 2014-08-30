@@ -71,5 +71,5 @@ and after the culling is applied:
 > *Notice how much stuff disappeared!*
 
 There are still more possible optimizations that can be applied to the search though, especially to fix the ravine problem.  
-I've even gotten [something working](/frustum_clamping.html), but it'll be for another post :)
+I've even got [something working](/frustum_clamping.html), but it'll be for another post :)
 
