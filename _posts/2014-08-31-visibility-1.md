@@ -78,4 +78,4 @@ style="border:1px solid #000000;">
 >the green lines tell which face can see which other.*
 
 After the chunks are all connected together through their visible faces, it's time to start thinking of how to use this to decide what we're going to show on screen, and this is where things start to be more interesting!  
-I'll try to explain how the visibility graph is used in [Part 2](http://localhost:4000/2014/07/22/visibility-2.html), for all of those not already too bored :)
+I'll try to explain how the visibility graph is used in [Part 2]({% post_url 2014-08-31-visibility-1 %}), for all of those not already too bored :)

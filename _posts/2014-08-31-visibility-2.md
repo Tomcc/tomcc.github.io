@@ -3,7 +3,7 @@ layout: culling-post-2
 title: The Advanced Cave Culling Algorithm™ Part 2 - Traversing the graph
 ---
 
-> *You can find the first part of the article [here]({% post_url 2014-07-22-visibility-1 %})*.
+> *You can find the first part of the article [here]({% post_url 2014-08-31-visibility-1 %})*.
 Now that we can build a visibility graph out of the cubic chunks, we need to find a way to search which ones are actually visible from the player's point of view!  
 Probably there are many ways to use the graph we have right now, but they all hinge on the same performance/accuracy trade off.
 
@@ -58,13 +58,17 @@ I've settled on using only two heuristics, that still are fairly effective: goin
 This hackish thing, experimentally, contributes 5% to 15% of the cull ratio depending on the scene, and it manly smooths out huge caves that would pop into visibility if the search wasn't stopped earlier!  
 The bad news is that this doesn't do much at all for surface ravines, because their shape allows sunlight to reach the bottom. Oh well.  
 
-Conclusions
+Pictures!
 ----
 
-It works! Here's a nice picture of the panorama on top after the culling is applied:
+It works! Here's a nice picture of the panorama before,  
+
+<img src="/images/cull_before.jpg" width="830" height="509">
+and after the culling is applied:  
 
 <img src="/images/cull_after.jpg" width="830" height="509">
 > *Notice how much stuff disappeared!*
 
-
+There are still more possible optimizations that can be applied to the search though, especially to fix the ravine problem.  
+I've even gotten [something working](/frustum_clamping.html), but it'll be for another post :)
 

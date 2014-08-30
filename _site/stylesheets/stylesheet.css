@@ -93,7 +93,7 @@ strong {
   font-weight: bold;
 }
 
-img, canvas {
+canvas {
   position: relative;
   margin: 0 auto;
   max-width: 739px;
@@ -219,6 +219,26 @@ Full-Width Styles
   max-width: 740px;
   padding: 20px 10px;
   margin: 0 auto;
+}
+
+#magic {
+  position: absolute;
+  top: 0px;
+  right: 10px;
+  line-height: 10px;
+}
+
+#twitter_icon {
+  padding:20px 0px 0px 0px;
+  top:10px;
+}
+
+#twitter {
+  color: #fff;
+  font-size: 23px;
+  font-weight: 300;
+  text-shadow: 1px 1px #333333;
+  padding-left: 3px;
 }
 
 #forkme_banner {
