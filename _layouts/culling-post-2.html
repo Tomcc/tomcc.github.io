@@ -85,10 +85,18 @@ function drawVisibilityLine(cx, cy, face1, face2) {
   ctx.lineTo(b.x, b.y);  
 }
 
-function drawFog(cx, cy) {
+function drawFog(cx, cy, hidden) {
   ctx.beginPath();
-  ctx.globalAlpha = 0.3;
-  ctx.fillStyle = '#000000';
+  
+  if(hidden){
+    ctx.fillStyle = '#990000';
+    ctx.globalAlpha = 0.15;
+  }
+  else{
+    ctx.fillStyle = '#000000';
+    ctx.globalAlpha = 0.3;
+  }
+
   ctx.rect(cx*32,cy*32,32,32);
   ctx.fill();
   ctx.globalAlpha = 1;
@@ -149,14 +157,9 @@ function searchAndDraw(cxFrom, cyFrom, direction) {
   ctx.lineWidth = 1;
   ctx.strokeStyle = "#00d33c";
 
-  var count = 0;
   //search!
   while(queue.length > 0) {
     var top = queue.shift();
-    
-    ++count;
-    if(count == sx*sy)
-      return;
 
     var visit = function(x,y, throughFace) {
 
@@ -208,19 +211,48 @@ function searchAndDraw(cxFrom, cyFrom, direction) {
   ctx.stroke();
   ctx.globalAlpha = 1;
 
+  var count = 0;
   for(var y = 0; y < sy; ++y ) {
     for(var x = 0; x < sx; ++x) {
+
       if(visited[y][x] != 1)
-        drawFog(x,y);
+          drawFog(x,y, inFrustum(x,y,cxFrom,cyFrom,direction));
+      else if(!chunks[y][x].empty)
+        ++count;
     }
   }
+
+  return count;
+}
+
+function frustumCount(cpx, cpy, direction) {
+  var count = 0;
+  for(var y = 0; y < sy; ++y ) {
+    for(var x = 0; x < sx; ++x) {
+      if(!chunks[y][x].empty && inFrustum(x,y,cpx,cpy,direction))
+        ++count;
+    }
+  }
+  return count;
 }
 
 function redraw(cpx,cpy,direction) {
   ctx.clearRect(0,0,canvas.width, canvas.height);
   ctx.drawImage(terrainImg,0,0, canvas.width, canvas.height);
 
-  searchAndDraw(cpx, cpy, direction);
+  var avcCount = searchAndDraw(cpx, cpy, direction);
+  var normalCount = frustumCount(cpx, cpy, direction);
+
+  var hidden;
+  if(normalCount > 0)
+    hidden = (normalCount-avcCount)/normalCount;
+  else
+    hidden = 0;
+
+  ctx.fillStyle = "#000000";
+  ctx.font="30px Myriad Pro";
+  ctx.fillText("Reached: " + avcCount, 10, 30);
+  ctx.fillText("Hidden: " + Math.floor(hidden*100) + "%", 10, 70);
 }
 
 window.onload=function(){

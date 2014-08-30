@@ -37,6 +37,10 @@ Phew. That was a lot of text, but you can play around with this other javascript
 style="border:1px solid #000000;">
 </canvas>
 
+> *Move the mouse around to change the search's starting point, click&drag to change direction;
+> green lines show the path walked to reach each chunk, reddish chunks are culled away!  
+> Note that in 2D the culling ratio is higher than in 3D because there are less possible paths.*
+
 More filters!
 ----
 
