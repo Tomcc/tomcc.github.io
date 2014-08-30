@@ -12,7 +12,7 @@ Yeah, caves are kind of slow
 ----
 
 Minecraft's caves are really fun to explore and get lost in thanks to their generated sponge-like structure and huge walkable area, and they have always been a part of Minecraft we wanted to bring over to MCPE.  
-However, while they are pretty cool for the gameplay, they are the ultimate [overdraw](http://en.wikipedia.org/wiki/Fillrate) nightmare:  
+However, while they are pretty cool for the gameplay, they are the ultimate <a href="http://en.wikipedia.org/wiki/Fillrate" target="_blank">overdraw</a>) nightmare:  
 * rendering the caves by tessellating their surfaces requires a massive amount of triangles
 * they are really chaotic and twisted
 * visible from potentially everywhere
@@ -33,7 +33,7 @@ Things people tried before
 ----
 
 **Minecraft PC's Advanced OpenGL**  
-Notch originally tackled the problem of overdraw on PC by making use of the then-advanced OpenGL function called [Hardware Occlusion Queries](http://archive.gamedev.net/archive/reference/programming/features/occlusionculling/index.html): it would draw a cubic "hull" of each 16x16x16 cube of blocks, then query the result to check if any pixels of the hull were visible.  
+Notch originally tackled the problem of overdraw on PC by making use of the then-advanced OpenGL function called <a href="http://http.developer.nvidia.com/GPUGems2/gpugems2_chapter06.html" target="_blank">Hardware Occlusion Queries</a>: it would draw a cubic "hull" of each 16x16x16 cube of blocks, then query the result to check if any pixels of the hull were visible.  
 If so, *all* of the chunk was deemed visible, and rendered.  
 This works for some GPUs (desktop Nvidia variants, primarily) but unfortunately it isn't half as good as it sounds like: apart from the fact that rendering a lot more cubes is even slower, GPUs are inherently *asynchronous*.  
 That is, your GPU, at any time, lags from 1 to 3 frames *behind* what the CPU is doing right now.  
@@ -58,14 +58,14 @@ After all, we know from which direction we are looking from, and that's an infor
 >*Coming from my direction and **entering the chunk** through face A, is it possible to **exit the chunk** through face B*?
 
 Answering this question is actually quite fast, and requires storing just 15 bits in each chunk, one for each possible pair of faces - however those 15 bits have to be updated every time an opaque block changes in the chunk.  
-This is actually a somewhat expensive operation (~0.1-0.2 ms on most devices I tried) that would have made the stutter worse if done on the main thread. In fact, both MCPE and PC (props to [@Dinnerbone](https://twitter.com/Dinnerbone)) now do this in the background!
+This is actually a somewhat expensive operation (~0.1-0.2 ms on most devices I tried) that would have made the stutter worse if done on the main thread. In fact, both MCPE and PC (props to <a href="https://twitter.com/Dinnerbone" target="_blank">@Dinnerbone</a>) now do this in the background!
 
 Rebuilding the graph
 -----------
 
 It's rather straightforward to build the connectivity graph for a chunk when an opaque block changes, it follows a simple algorithm:
 * for each block that's not opaque,
-* start a 3D [flood fill](http://en.wikipedia.org/wiki/Flood_fill), with an empty set of faces
+* start a 3D <a href="http://en.wikipedia.org/wiki/Flood_fill" target="_blank">flood fill</a>, with an empty set of faces
 * every time the flood fill tries to exit the boundaries of the chunk through a face, add the face to the set
 * when the flood fill is done, connect together all the faces that were added to the set.
 

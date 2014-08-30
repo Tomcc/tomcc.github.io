@@ -14,7 +14,7 @@ The visibility info we computed above still helps a lot with rays, as we can eas
 However, this is kind of not fast- at max render distance we have thousands of chunks loaded in the area around the player (17.000 is not uncommon on PC!) and each chunk needs 7 raycasts at most - even if we would get the maximum culling ratio, running 119.000 raycasts per frame is not going to make the game any faster and wouldn't be an optimization at all, so something smarter was needed.  
 
 **Breadth-first searching**  
-Instead, what I settled on was a regular [breadth-first search](http://en.wikipedia.org/wiki/Breadth-first_search), with some hacks.  
+Instead, what I settled on was a regular <a href="http://en.wikipedia.org/wiki/Breadth-first_search" target="_blank">breadth-first search</a>, with some hacks.  
 If the chunks are stored in a contiguous 3D grid, the access time is O(1) and it's pretty fast in practice; plus, the BFS has a nice additional benefit: it visits the chunks front-to-back naturally, letting the GPU's Hidden Surface Removal powers shine.  
 
 In fact, the three main time-sinks we had on the CPU side in MCPE 0.8 and PC were **frustum culling**, **depth sorting** and **rebuild scheduling**; their total accounted for around 14% of the frame time on both versions. Plus, the scheduling on PC was notoriously bad and unresponsive (holes in the world, anyone?).  
@@ -71,5 +71,5 @@ and after the culling is applied:
 > *Notice how much stuff disappeared!*
 
 There are still more possible optimizations that can be applied to the search though, especially to fix the ravine problem.  
-I've even got [something working](/frustum_clamping.html), but it'll be for another post :)
+I've even got <a href="/frustum_clamping.html" target="_blank">something working</a>, but it'll be for another post :)
 
