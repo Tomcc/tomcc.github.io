@@ -123,15 +123,36 @@ function fixAngle(ø) {
     return ø;
 }
 
+function pointInFrustum(x, y, ox, oy, direction ) {
+
+  var dx = x-ox;
+  var dy = y-oy;
+  var l = Math.sqrt(dx*dx+dy*dy);
+
+  dx = dx/l;
+  dy = dy/l;
+
+  var dirx = Math.cos(direction);
+  var diry = Math.sin(direction);
+
+  return (dx*dirx + dy*diry) > 0.75;
+}
+
 function inFrustum(cx, cy, cox, coy, direction) {
-  var a = Math.atan2(cox-cx, coy-cy);
 
-  var max = direction + toRad(70/2);
-  var min = direction - toRad(70/2);
+  var ox = cox*16+8;
+  var oy = coy*16+8;
 
-  console.log( "angle: " + a + "(" + min + "," + max + ")");
+  var minx = cx*16;
+  var miny = cy*16;
 
-  return a < max && a > min;
+  var maxx = minx+16;
+  var maxy = miny+16;
+
+  return (pointInFrustum(minx,miny, ox, oy, direction) || 
+    pointInFrustum(minx,maxy, ox, oy, direction) ||
+    pointInFrustum(maxx,maxy, ox, oy, direction) ||
+    pointInFrustum(maxx,miny, ox, oy, direction));
 }
 
 function searchAndDraw(cxFrom, cyFrom, direction) {
@@ -157,8 +178,7 @@ function searchAndDraw(cxFrom, cyFrom, direction) {
   //search!
   while(queue.length > 0) {
     var top = queue.shift();
-    drawVisibility(top.x, top.y);
-
+    
     ++count;
     if(count == sx*sy)
       return;
@@ -180,15 +200,17 @@ function searchAndDraw(cxFrom, cyFrom, direction) {
         var n = chunks[y][x];
         if(!n.canSee({comingFrom:top.from, to:throughFace}))
           return;
-
-        // if(!inFrustum(x,y,cxFrom,cyFrom,direction))
-        //   return;
       }
+
+      if(!inFrustum(x,y,cxFrom,cyFrom,direction))
+        return; 
 
       visited[y][x] = 1;
 
       var newDirs = top.dirs.slice(0);
       newDirs[throughFace] = 1;
+
+      drawVisibility(x,y);
 
       queue.push({
         x:    x, 
@@ -211,13 +233,11 @@ function searchAndDraw(cxFrom, cyFrom, direction) {
   }
 }
 var lol = 0;
-function redraw() {
+function redraw(cpx,cpy) {
   ctx.clearRect(0,0,canvas.width, canvas.height);
   ctx.drawImage(terrainImg,0,0, canvas.width, canvas.height);
 
-  searchAndDraw(3, 5, lol);
-
-  lol += 0.1;
+  searchAndDraw(cpx, cpy, lol);
 }
 
 window.onload=function(){
@@ -235,12 +255,20 @@ window.onload=function(){
     }
   }
 
-  redraw();
+  redraw(3,5);
 };
 
 canvas.addEventListener('click',
 	function(event) {
-    redraw();
+
+    var pos = getMousePos(canvas,event);
+
+    var x = Math.floor(pos.x / 32);
+    var y = Math.floor(pos.y / 32);
+
+    alert(x + " " + y);
+
+    redraw( x, y );
 	}
 	, false);
 
