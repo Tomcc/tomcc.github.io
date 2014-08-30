@@ -2,23 +2,76 @@
     
 {% include post-content.html %}
 
-<script src="/utils.js"></script>
+<img id="terrain" src="/images/terrain.png" style="display:none">
 
+<script src="/utils.js"></script>
+<script src="/chunk.js"></script>
 <script>
+
+var chunks = [];
+
+var terrainImg = null;
 
 var canvas = document.getElementById("example");
 var ctx = canvas.getContext("2d");
 
-var sx = Math.floor((canvas.width) / 16);
-var sy = Math.floor((canvas.height) / 16);
+var sx = Math.floor((canvas.width) / 32);
+var sy = Math.floor((canvas.height) / 32);
+
+function readGrid(image, x, y) {
+  var grid = [];
+  var pixels = ctx.getImageData(x,y,16,16);
+
+  for(var y = 0; y < 16; ++y ) {
+    for(var x = 0; x < 16; ++x) {
+      grid[x + y*16] = pixels.data[(x+y*16)*4 + 3] > 0 ? 1 : 0; //get the alpha of each pixel
+    }
+  }
+
+  return grid;
+}
+
+function drawChunk(cx, cy) {
+  var chunk = chunks[cy][cx];
+  for(var y = 0; y < 16; ++y ) {
+    for(var x = 0; x < 16; ++x) {
+      
+      if(chunk.at(x,y) > 0) 
+      {
+        ctx.beginPath();
+        ctx.fillStyle = 'yellow';
+        ctx.rect( cx * 32 + x * 2, cy * 32 + y * 2, 2, 2);
+        ctx.fill();
+      }
+    }
+  }
+}
+
+function redraw() {
+  ctx.clearRect(0,0,canvas.width, canvas.height);
+  ctx.drawImage(terrainImg,0,0, canvas.width, canvas.height);
+}
 
 window.onload=function(){
+  terrainImg = document.getElementById("terrain");
+  ctx.drawImage(terrainImg,0,0, canvas.width/2, canvas.height/2);
 
+  //setup the chunks
+  for(var y = 0; y < sy; ++y ) {
+    chunks[y] = [];
+
+    for(var x = 0; x < sx; ++x) {
+      var grid = readGrid( terrainImg, x * 16, y * 16);
+      chunks[y][x] = new Chunk(grid);
+    }
+  }
+
+  redraw();
 };
 
 canvas.addEventListener('click',
 	function(event) {
-		alert("meh");
+
 	}
 	, false);
 
