@@ -1,0 +1,27 @@
+{% include header.html %}
+    
+{% include post-content.html %}
+
+<script src="/utils.js"></script>
+
+<script>
+
+var canvas = document.getElementById("example");
+var ctx = canvas.getContext("2d");
+
+var sx = Math.floor((canvas.width) / 16);
+var sy = Math.floor((canvas.height) / 16);
+
+window.onload=function(){
+
+};
+
+canvas.addEventListener('click',
+	function(event) {
+		alert("meh");
+	}
+	, false);
+
+</script>
+
+{% include footer.html %}

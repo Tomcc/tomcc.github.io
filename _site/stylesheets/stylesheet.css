@@ -93,7 +93,7 @@ strong {
   font-weight: bold;
 }
 
-img {
+img, canvas {
   position: relative;
   margin: 0 auto;
   max-width: 739px;
@@ -108,7 +108,7 @@ img {
   -ms-box-shadow: 0 0 5px #ebebeb;
 }
 
-p img {
+p img, canvas {
   display: inline;
   margin: 0;
   padding: 0px;

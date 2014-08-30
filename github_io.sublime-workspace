@@ -4,6 +4,26 @@
 		"selected_items":
 		[
 			[
+				"wid",
+				"width"
+			],
+			[
+				"da",
+				"dashArray"
+			],
+			[
+				"face",
+				"face2"
+			],
+			[
+				"to",
+				"touchedByFloodCount"
+			],
+			[
+				"touch",
+				"touchedByFloodCount"
+			],
+			[
 				"rand",
 				"randomInRange"
 			],
@@ -284,10 +304,6 @@
 				"Empty"
 			],
 			[
-				"to",
-				"totalfiles"
-			],
-			[
 				"pi",
 				"printedFiles"
 			],
@@ -498,42 +514,41 @@
 			[
 				"doma",
 				"domainStart"
-			],
-			[
-				"v",
-				"val"
-			],
-			[
-				"actua",
-				"actualurl"
-			],
-			[
-				"act",
-				"actualurl"
-			],
-			[
-				"end",
-				"endOfAddress"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "/Users/tommaso/DEV/test.cpp",
+			"file": "_layouts/culling-post.html",
 			"settings":
 			{
-				"buffer_size": 838,
+				"buffer_size": 6468,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "0 0 0 0 \n2 0 0 0 \n0 0 0 0 \n0 0 2 0 \n[Finished in 0.1s]",
+			"file": "_includes/header.html",
 			"settings":
 			{
-				"buffer_size": 54,
-				"line_ending": "Unix",
-				"name": "Build output"
+				"buffer_size": 568,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "stylesheets/stylesheet.css",
+			"settings":
+			{
+				"buffer_size": 6024,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/2014-07-22-visibility-2.md",
+			"settings":
+			{
+				"buffer_size": 5789,
+				"line_ending": "Unix"
 			}
 		}
 	],
@@ -602,6 +617,8 @@
 	},
 	"file_history":
 	[
+		"/Users/tommaso/DEV/github_io/stylesheets/stylesheet.css",
+		"/Users/tommaso/DEV/test.cpp",
 		"/Users/tommaso/Downloads/hqx-1.1/README",
 		"/Users/tommaso/Downloads/hqx-1.1/NEWS",
 		"/Users/tommaso/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
@@ -609,7 +626,6 @@
 		"/Users/tommaso/Music/.localized",
 		"/usr/bin/minecraft_server",
 		"/Users/tommaso/DEV/2048.rs",
-		"/Users/tommaso/DEV/test.cpp",
 		"/Users/tommaso/Dropbox/minecraft_server/eula.txt",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src/client/renderer/LevelRenderer.cpp",
 		"/Users/tommaso/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
@@ -728,12 +744,11 @@
 		"/Users/tommaso/DEV/Minecraftpe/handheld/project/iosproj/DerivedData/minecraftpe/Build/Products/Release-iphoneos/minecraftpe.app/startup.images",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src/world/item/ClockItem.h",
 		"/Users/tommaso/DEV/Minecraftpe/handheld/src/client/gui/screens/ChooseLevelScreen.cpp",
-		"/Users/tommaso/DEV/Minecraftpe/handheld/src/common_header.h",
-		"/Users/tommaso/DEV/Minecraftpe/handheld/project/android/bin/local.properties"
+		"/Users/tommaso/DEV/Minecraftpe/handheld/src/common_header.h"
 	],
 	"find":
 	{
-		"height": 35.0
+		"height": 36.0
 	},
 	"find_in_files":
 	{
@@ -752,6 +767,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"hr",
+			"width",
+			"height",
+			"width",
 			"LIBS",
 			" -l",
 			"zlib_compressor",
@@ -875,11 +894,7 @@
 			"leveldata",
 			"restartserv",
 			"debug",
-			"MAIN_CLASS",
-			"ANDROID",
-			"v1_",
-			"v1",
-			"@"
+			"MAIN_CLASS"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -887,6 +902,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"canvas.height",
+			"canvas.width",
 			"1,",
 			"2,",
 			"1",
@@ -1012,63 +1029,118 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/Users/tommaso/DEV/test.cpp",
+					"file": "_layouts/culling-post.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 838,
+						"buffer_size": 6468,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								225,
-								225
+								3122,
+								3122
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
+							"syntax": "Packages/HTML/HTML.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 255.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "_includes/header.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 568,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								534,
+								534
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
+				},
 				{
-					"buffer": 1,
+					"buffer": 2,
+					"file": "stylesheets/stylesheet.css",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 54,
+						"buffer_size": 6024,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								54,
-								54
+								4327,
+								4327
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/CSS/CSS.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1082.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "_posts/2014-07-22-visibility-2.md",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5789,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								501,
+								501
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1097,18 +1169,11 @@
 				0,
 				1,
 				1
-			],
-			[
-				1,
-				0,
-				2,
-				1
 			]
 		],
 		"cols":
 		[
 			0.0,
-			0.632961309524,
 			1.0
 		],
 		"rows":
@@ -1129,7 +1194,7 @@
 	"project": "",
 	"replace":
 	{
-		"height": 64.0
+		"height": 66.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -2054,7 +2119,7 @@
 	"show_minimap": true,
 	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": false,
+	"side_bar_visible": true,
 	"side_bar_width": 150.0,
 	"status_bar_visible": true,
 	"template_settings":

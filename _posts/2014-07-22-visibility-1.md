@@ -1,5 +1,5 @@
 ---
-layout: culling-post
+layout: culling-post-1
 title: The Advanced Cave Culling Algorithm™, or, making Minecraft faster
 ---
 
@@ -71,7 +71,7 @@ It's rather straightforward to build the connectivity graph for a chunk when an 
 
 Try to place/remove opaque blocks in this javascript thing here to see how it would work in practice in a 2D chunk:  
 
-<canvas id="example1" width="610" height="610"
+<canvas id="example" width="610" height="610"
 style="border:1px solid #000000;">
 </canvas>
 >*each color represents a different flood fill, dark tiles don't lead anywhere;  
