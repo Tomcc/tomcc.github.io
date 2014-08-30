@@ -3,7 +3,10 @@ layout: culling-post-2
 title: The Advanced Cave Culling Algorithm™ Part 2 - Traversing the graph
 ---
 
-> *You can find the first part of the article [here]({% post_url 2014-08-31-visibility-1 %})*.  
+<blockquote>
+<p><em>You can find the first part of the article <a href="/2014/08/31/visibility-1.html">here</a></em>.</p>
+</blockquote>
+
 Now that we can build a visibility graph out of the cubic chunks, we need to find a way to search which ones are actually visible from the player's point of view!  
 Probably there are many ways to use the graph we have right now, but they all hinge on the same performance/accuracy trade off.
 
