@@ -105,7 +105,7 @@ function drawVisibilityLine(face1, face2) {
     ctx.globalAlpha = 1;
 }
 
-function redraw(connections) {
+function redraw() {
 	if(stoneTex == null)
 		return;
 	ctx.clearRect(0,0,canvas.width, canvas.height);
@@ -127,7 +127,7 @@ function redraw(connections) {
 	//draw the lines corresponding to visibility paths
 	for(var i = 0; i < 4; ++i) {
 		for(var j = 0; j < i; ++j) {
-			if(connections[i][j] > 0)
+			if(chunk.connections[i][j] > 0)
 				drawVisibilityLine(i, j);
 		}
 	}
@@ -136,16 +136,17 @@ function redraw(connections) {
 window.onload=function(){
 	stoneTex = document.getElementById("stone");
 
-	redraw(chunk.updateVisibility());	
+	chunk.updateVisibility();
+	redraw();	
 };
 
 canvas.addEventListener('click',
 	function(event) {
 
 		var pos = getMousePos(canvas, event);
-		var connections = chunk.toggleCell( pos, canvas );
+		chunk.toggleCell( pos, canvas );
 
-		redraw( connections );
+		redraw();
 	}
 	, false);
 

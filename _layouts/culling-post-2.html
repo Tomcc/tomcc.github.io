@@ -47,57 +47,177 @@ function drawChunk(cx, cy) {
   }
 }
 
+var LEFT = 0;
+var RIGHT = 1;
+var UP = 2;
+var DOWN = 3;
+
+var oppositeFace =
+[
+  RIGHT,
+  LEFT,
+  DOWN,
+  UP
+];
+
 function posForFaceCenter(cx, cy, i) {
   var min = {x:cx*32, y:cy*32};
   var max = {x:(cx+1)*32,y:(cy+1)*32};
   var middle = {x:(max.x+min.x)/2, y:(max.y+min.y)/2};
 
   switch(i) {
-    case 0: return {x:min.x,    y:middle.y  };
-    case 1: return {x:max.x,    y:middle.y  };
-    case 2: return {x:middle.x, y:min.y     };
-    case 3: return {x:middle.x, y:max.y     };
+    case LEFT: return {x:min.x,    y:middle.y  }; //left
+    case RIGHT: return {x:max.x,    y:middle.y  }; //right
+    case UP: return {x:middle.x, y:min.y     }; //up
+    case DOWN: return {x:middle.x, y:max.y     }; //down
     default:
     alert("wtf");
   }
 }
 
-function drawVisibilityLine(cx, cy, face1, face2) {
+function drawVisibilityLine(cx, cy, face1, face2, empty) {
   var a = posForFaceCenter(cx, cy, face1);
   var b = posForFaceCenter(cx, cy, face2);
 
   ctx.beginPath();
   ctx.lineWidth = 1;
-  ctx.globalAlpha = 0.7;
+  if(empty)
+    ctx.globalAlpha = 0.3;
+  else
+    ctx.globalAlpha = 0.7;
   ctx.strokeStyle = "#00d33c";
   ctx.moveTo(a.x, a.y);
   ctx.lineTo(b.x, b.y);
   ctx.stroke();
   ctx.globalAlpha = 1;
 }
-
 function drawVisibility(cx, cy) {
   //draw the lines corresponding to visibility paths
-  var connections = chunks[cy][cx].updateVisibility();
+  var chunk = chunks[cy][cx];
 
   for(var i = 0; i < 4; ++i) {
     for(var j = 0; j < i; ++j) {
-      if(connections[i][j] > 0)
-        drawVisibilityLine(cx, cy, i, j);
+      if(chunk.connections[i][j] > 0)
+        drawVisibilityLine(cx, cy, i, j, chunk.empty);
     }
   }
 }
 
+function drawFog(cx, cy) {
+  ctx.beginPath();
+  ctx.globalAlpha = 0.3;
+  ctx.fillStyle = '#000000';
+  ctx.rect(cx*32,cy*32,32,32);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+function toRad(ø) {
+  return ø / 180 * Math.PI;
+}
+
+function fixAngle(ø) {
+  if( ø < 0 )
+    return ø + Math.PI;
+  else
+    return ø;
+}
+
+function inFrustum(cx, cy, cox, coy, direction) {
+  var a = Math.atan2(cox-cx, coy-cy);
+
+  var max = direction + toRad(70/2);
+  var min = direction - toRad(70/2);
+
+  console.log( "angle: " + a + "(" + min + "," + max + ")");
+
+  return a < max && a > min;
+}
+
+function searchAndDraw(cxFrom, cyFrom, direction) {
+
+  var queue = [];
+
+  //init the array
+  var visited = [];
+  for(var y = 0; y < sy; ++y ) {
+    visited[y] = [];
+    for(var x = 0; x < sx; ++x)
+      visited[y][x] = 0;
+  }
+
+  // console.log("");
+  // console.log("");
+  // console.log("");
+
+  queue.push( {x:cxFrom, y:cyFrom, from: -1, dirs:[0,0,0,0]} );
+  visited[cyFrom][cxFrom] = 1;
+
+  var count = 0;
+  //search!
+  while(queue.length > 0) {
+    var top = queue.shift();
+    drawVisibility(top.x, top.y);
+
+    ++count;
+    if(count == sx*sy)
+      return;
+
+    var visit = function(x,y, throughFace) {
+
+      //don't revisit directions
+      if(top.dirs[oppositeFace[throughFace]] == 1)
+        return;
+
+      if(x < 0 || x >= sx || y < 0 || y >= sy )
+        return;
+
+      if(visited[y][x] > 0)
+        return;
+
+      //check the visibility thing
+      if(top.from != -1) {
+        var n = chunks[y][x];
+        if(!n.canSee({comingFrom:top.from, to:throughFace}))
+          return;
+
+        // if(!inFrustum(x,y,cxFrom,cyFrom,direction))
+        //   return;
+      }
+
+      visited[y][x] = 1;
+
+      var newDirs = top.dirs.slice(0);
+      newDirs[throughFace] = 1;
+
+      queue.push({
+        x:    x, 
+        y:    y,
+        from: oppositeFace[throughFace],
+        dirs: newDirs});
+    };
+
+    visit(top.x+1,top.y, 0);
+    visit(top.x,top.y+1, 2);
+    visit(top.x-1,top.y, 1);
+    visit(top.x,top.y-1, 3);
+  }
+
+  for(var y = 0; y < sy; ++y ) {
+    for(var x = 0; x < sx; ++x) {
+      if(visited[y][x] != 1)
+        drawFog(x,y);
+    }
+  }
+}
+var lol = 0;
 function redraw() {
   ctx.clearRect(0,0,canvas.width, canvas.height);
   ctx.drawImage(terrainImg,0,0, canvas.width, canvas.height);
 
+  searchAndDraw(3, 5, lol);
 
-  for(var y = 0; y < sy; ++y ) {
-    for(var x = 0; x < sx; ++x) {
-      drawVisibility(x,y);
-    }
-  }
+  lol += 0.1;
 }
 
 window.onload=function(){
@@ -111,6 +231,7 @@ window.onload=function(){
     for(var x = 0; x < sx; ++x) {
       var grid = readGrid( terrainImg, x * 16, y * 16);
       chunks[y][x] = new Chunk(grid);
+      chunks[y][x].updateVisibility();
     }
   }
 
@@ -119,7 +240,7 @@ window.onload=function(){
 
 canvas.addEventListener('click',
 	function(event) {
-
+    redraw();
 	}
 	, false);
 

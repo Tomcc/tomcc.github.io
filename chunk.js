@@ -24,6 +24,14 @@ function Chunk(grid) {
 	this.touchedByFlood = [];
 	this.touchedByFloodCount = 0;
 	this.toReplace = 1;
+	this.connections = [
+		[0,0,0,0],
+		[0,0,0,0],
+		[0,0,0,0],
+		[0,0,0,0]
+	];
+
+	this.empty = false;
 
 	this.floodFill = function(x,y) {
 
@@ -61,16 +69,19 @@ function Chunk(grid) {
 	};
 
 	this.updateVisibility = function() {
+		this.empty = true;
 
 		for( var i = 0; i < grid.length; ++i ) {
-			if(this.grid[i] > 0) {
+			if(this.grid[i] > 0)
 				this.grid[i] = 1; //reset the flood fills
-			}
+			
+			else
+				this.empty = false;
 		}
 
 		this.floodID = 2;
 
-		var connections = [
+		this.connections = [
 			[0,0,0,0],
 			[0,0,0,0],
 			[0,0,0,0],
@@ -94,8 +105,8 @@ function Chunk(grid) {
 					if(this.touchedByFlood[i] > 0) {
 						for(var j = 0; j < 4; ++j) {
 							if(this.touchedByFlood[j] > 0) {
-								connections[i][j] = 1;
-								connections[j][i] = 1;
+								this.connections[i][j] = 1;
+								this.connections[j][i] = 1;
 							}
 						}
 					}
@@ -109,8 +120,6 @@ function Chunk(grid) {
 				this.floodID = this.toReplace;
 			}
 		}
-
-		return connections;
 	};
 
 	this.toggleCell = function(pos, canvas) {
@@ -120,10 +129,14 @@ function Chunk(grid) {
 		
 		this.grid[idx(x,y)] = (this.at(x,y) == 0 ? 1 : 0);
 
-		return this.updateVisibility();
+		this.updateVisibility();
 	};
 	
 	this.at = function(x,y) {
 		return this.grid[idx(x,y)];
 	};
+
+	this.canSee = function(face) {
+		return this.connections[face.comingFrom][face.to] > 0;
+	}
 }
