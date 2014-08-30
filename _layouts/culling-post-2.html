@@ -24,7 +24,7 @@ function readGrid(image, x, y) {
 
   for(var y = 0; y < 16; ++y ) {
     for(var x = 0; x < 16; ++x) {
-      grid[x + y*16] = pixels.data[(x+y*16)*4 + 3] > 0 ? 1 : 0; //get the alpha of each pixel
+      grid[x + y*16] = pixels.data[(x+y*16)*4 + 3] > 0 ? 0 : 1; //get the alpha of each pixel
     }
   }
 
@@ -47,9 +47,57 @@ function drawChunk(cx, cy) {
   }
 }
 
+function posForFaceCenter(cx, cy, i) {
+  var min = {x:cx*32, y:cy*32};
+  var max = {x:(cx+1)*32,y:(cy+1)*32};
+  var middle = {x:(max.x+min.x)/2, y:(max.y+min.y)/2};
+
+  switch(i) {
+    case 0: return {x:min.x,    y:middle.y  };
+    case 1: return {x:max.x,    y:middle.y  };
+    case 2: return {x:middle.x, y:min.y     };
+    case 3: return {x:middle.x, y:max.y     };
+    default:
+    alert("wtf");
+  }
+}
+
+function drawVisibilityLine(cx, cy, face1, face2) {
+  var a = posForFaceCenter(cx, cy, face1);
+  var b = posForFaceCenter(cx, cy, face2);
+
+  ctx.beginPath();
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.7;
+  ctx.strokeStyle = "#00d33c";
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
+function drawVisibility(cx, cy) {
+  //draw the lines corresponding to visibility paths
+  var connections = chunks[cy][cx].updateVisibility();
+
+  for(var i = 0; i < 4; ++i) {
+    for(var j = 0; j < i; ++j) {
+      if(connections[i][j] > 0)
+        drawVisibilityLine(cx, cy, i, j);
+    }
+  }
+}
+
 function redraw() {
   ctx.clearRect(0,0,canvas.width, canvas.height);
   ctx.drawImage(terrainImg,0,0, canvas.width, canvas.height);
+
+
+  for(var y = 0; y < sy; ++y ) {
+    for(var x = 0; x < sx; ++x) {
+      drawVisibility(x,y);
+    }
+  }
 }
 
 window.onload=function(){
