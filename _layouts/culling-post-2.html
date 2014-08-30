@@ -18,6 +18,8 @@ var ctx = canvas.getContext("2d");
 var sx = Math.floor((canvas.width) / 32);
 var sy = Math.floor((canvas.height) / 32);
 
+var dragging = false;
+
 function readGrid(image, x, y) {
   var grid = [];
   var pixels = ctx.getImageData(x,y,16,16);
@@ -75,32 +77,12 @@ function posForFaceCenter(cx, cy, i) {
   }
 }
 
-function drawVisibilityLine(cx, cy, face1, face2, empty) {
+function drawVisibilityLine(cx, cy, face1, face2) {
   var a = posForFaceCenter(cx, cy, face1);
   var b = posForFaceCenter(cx, cy, face2);
 
-  ctx.beginPath();
-  ctx.lineWidth = 1;
-  if(empty)
-    ctx.globalAlpha = 0.3;
-  else
-    ctx.globalAlpha = 0.7;
-  ctx.strokeStyle = "#00d33c";
   ctx.moveTo(a.x, a.y);
-  ctx.lineTo(b.x, b.y);
-  ctx.stroke();
-  ctx.globalAlpha = 1;
-}
-function drawVisibility(cx, cy) {
-  //draw the lines corresponding to visibility paths
-  var chunk = chunks[cy][cx];
-
-  for(var i = 0; i < 4; ++i) {
-    for(var j = 0; j < i; ++j) {
-      if(chunk.connections[i][j] > 0)
-        drawVisibilityLine(cx, cy, i, j, chunk.empty);
-    }
-  }
+  ctx.lineTo(b.x, b.y);  
 }
 
 function drawFog(cx, cy) {
@@ -110,17 +92,6 @@ function drawFog(cx, cy) {
   ctx.rect(cx*32,cy*32,32,32);
   ctx.fill();
   ctx.globalAlpha = 1;
-}
-
-function toRad(ø) {
-  return ø / 180 * Math.PI;
-}
-
-function fixAngle(ø) {
-  if( ø < 0 )
-    return ø + Math.PI;
-  else
-    return ø;
 }
 
 function pointInFrustum(x, y, ox, oy, direction ) {
@@ -174,6 +145,10 @@ function searchAndDraw(cxFrom, cyFrom, direction) {
   queue.push( {x:cxFrom, y:cyFrom, from: -1, dirs:[0,0,0,0]} );
   visited[cyFrom][cxFrom] = 1;
 
+  ctx.beginPath();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "#00d33c";
+
   var count = 0;
   //search!
   while(queue.length > 0) {
@@ -187,43 +162,51 @@ function searchAndDraw(cxFrom, cyFrom, direction) {
 
       //don't revisit directions
       if(top.dirs[oppositeFace[throughFace]] == 1)
-        return;
+        return false;
 
       if(x < 0 || x >= sx || y < 0 || y >= sy )
-        return;
+        return false;
 
       if(visited[y][x] > 0)
-        return;
+        return false;
 
       //check the visibility thing
       if(top.from != -1) {
         var n = chunks[y][x];
         if(!n.canSee({comingFrom:top.from, to:throughFace}))
-          return;
+          return false;
       }
 
       if(!inFrustum(x,y,cxFrom,cyFrom,direction))
-        return; 
+        return false; 
 
       visited[y][x] = 1;
 
       var newDirs = top.dirs.slice(0);
       newDirs[throughFace] = 1;
 
-      drawVisibility(x,y);
-
       queue.push({
         x:    x, 
         y:    y,
         from: oppositeFace[throughFace],
         dirs: newDirs});
+
+      return true;
     };
 
-    visit(top.x+1,top.y, 0);
-    visit(top.x,top.y+1, 2);
-    visit(top.x-1,top.y, 1);
-    visit(top.x,top.y-1, 3);
+    var visitAndDraw = function(ox,oy,face) {
+      if(visit(top.x + ox, top.y + oy, face) && top.from != -1)
+        drawVisibilityLine(top.x, top.y, oppositeFace[top.from], oppositeFace[face]);  
+    };
+
+    visitAndDraw(1,0,0);
+    visitAndDraw(0,1,2);
+    visitAndDraw(-1,0,1);
+    visitAndDraw(0,-1,3);
   }
+
+  ctx.stroke();
+  ctx.globalAlpha = 1;
 
   for(var y = 0; y < sy; ++y ) {
     for(var x = 0; x < sx; ++x) {
@@ -232,12 +215,12 @@ function searchAndDraw(cxFrom, cyFrom, direction) {
     }
   }
 }
-var lol = 0;
-function redraw(cpx,cpy) {
+
+function redraw(cpx,cpy,direction) {
   ctx.clearRect(0,0,canvas.width, canvas.height);
   ctx.drawImage(terrainImg,0,0, canvas.width, canvas.height);
 
-  searchAndDraw(cpx, cpy, lol);
+  searchAndDraw(cpx, cpy, direction);
 }
 
 window.onload=function(){
@@ -255,22 +238,63 @@ window.onload=function(){
     }
   }
 
-  redraw(3,5);
+  redraw(3,5,0);
 };
 
-canvas.addEventListener('click',
-	function(event) {
+var direction = 0;
+var lastCX = -1;
+var lastCY = -1;
 
-    var pos = getMousePos(canvas,event);
+var dragStart = {};
+
+var onMove = function(event) {
+  var pos = getMousePos(canvas,event);
+
+  if(dragging) {
+
+    direction = -Math.atan2(pos.x - dragStart.x, pos.y - dragStart.y) + Math.PI/2;
+    
+    redraw(lastCX, lastCY,direction);
+
+    ctx.beginPath();
+    ctx.strokeStyle = '#ff0000';
+    ctx.lineWidth = 3;
+    ctx.moveTo(dragStart.x, dragStart.y);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+  }
+  else {
 
     var x = Math.floor(pos.x / 32);
     var y = Math.floor(pos.y / 32);
 
-    alert(x + " " + y);
+    if(x != lastCX || y != lastCY) {
+      redraw( x, y, direction );
+      lastCX = x;
+      lastCY = y;
+    }
+  }
+}
 
-    redraw( x, y );
-	}
-	, false);
+canvas.addEventListener('mousemove',
+	onMove,
+  false);
+
+canvas.addEventListener('mousedown',
+  function(event) {
+    dragging = true;
+
+    dragStart = getMousePos(canvas,event);
+  }
+  , false);
+
+canvas.addEventListener('mouseup',
+  function(event) {
+    dragging = false;
+  }
+  , false);
+
+
 
 </script>
 
