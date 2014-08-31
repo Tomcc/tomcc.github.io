@@ -5,3 +5,4 @@ lsi: false
 source: .
 baseurl: /
 url: http://localhost:4000
+markdown: kramdown

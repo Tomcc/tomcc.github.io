@@ -20,7 +20,8 @@ If the chunks are stored in a contiguous 3D grid, the access time is O(1) and it
 In fact, the three main time-sinks we had on the CPU side in MCPE 0.8 and PC were **frustum culling**, **depth sorting** and **rebuild scheduling**; their total accounted for around 14% of the frame time on both versions. Plus, the scheduling on PC was notoriously bad and unresponsive (holes in the world, anyone?).  
 The BFS algorithm solves allowed of them in linear time, and on top of that we get the visibility culling we were looking for!
 
-So now, here's roughly how the visibility search works, in a quite condensed way:
+So now, here's roughly how the visibility search works, in a quite condensed way:  
+
 * set up a queue of steps, where each step contains the **chunk** we want to visit next and the **face** we came from
 * find chunk the camera is inside of and push it on the queue as the first step
 * for each chunk, until the queue is empty, 
@@ -68,6 +69,7 @@ It works! Here's a nice picture of the panorama before,
 and after the culling is applied:  
 
 <img src="/images/cull_after.jpg" width="830" height="509">
+
 > *Notice how much stuff disappeared!*
 
 There are still more possible optimizations that can be applied to the search though, especially to fix the ravine problem.  

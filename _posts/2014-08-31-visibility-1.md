@@ -13,6 +13,7 @@ Yeah, caves are kind of slow
 
 Minecraft's caves are really fun to explore and get lost in thanks to their generated sponge-like structure and huge walkable area, and they have always been a part of Minecraft we wanted to bring over to MCPE.  
 However, while they are pretty cool for the gameplay, they are the ultimate <a href="http://en.wikipedia.org/wiki/Fillrate" target="_blank">overdraw</a>) nightmare:  
+
 * rendering the caves by tessellating their surfaces requires a massive amount of triangles
 * they are really chaotic and twisted
 * visible from potentially everywhere
