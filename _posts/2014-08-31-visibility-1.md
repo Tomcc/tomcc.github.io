@@ -64,7 +64,8 @@ This is actually a somewhat expensive operation (~0.1-0.2 ms on most devices I t
 Rebuilding the graph
 -----------
 
-It's rather straightforward to build the connectivity graph for a chunk when an opaque block changes, it follows a simple algorithm:
+It's rather straightforward to build the connectivity graph for a chunk when an opaque block changes, it follows a simple algorithm:  
+
 * for each block that's not opaque,
 * start a 3D <a href="http://en.wikipedia.org/wiki/Flood_fill" target="_blank">flood fill</a>, with an empty set of faces
 * every time the flood fill tries to exit the boundaries of the chunk through a face, add the face to the set
