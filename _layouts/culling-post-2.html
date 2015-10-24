@@ -160,6 +160,7 @@ function searchAndDraw(cxFrom, cyFrom, direction) {
   //search!
   while(queue.length > 0) {
     var top = queue.shift();
+    var current = chunks[top.y][top.x];
 
     var visit = function(x,y, throughFace) {
 
@@ -176,7 +177,7 @@ function searchAndDraw(cxFrom, cyFrom, direction) {
       //check the visibility thing
       if(top.from != -1) {
         var n = chunks[y][x];
-        if(!n.canSee({comingFrom:top.from, to:throughFace}))
+        if(!current.canSee({comingFrom:top.from, to:throughFace}))
           return false;
       }
 
