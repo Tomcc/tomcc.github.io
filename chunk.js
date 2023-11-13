@@ -45,12 +45,12 @@ function Chunk(grid) {
 			this.touchedByFlood[1] = true;
 			return;
 		}
-		else if(y < 0){
+		else if(y > 15){
 			++this.touchedByFloodCount;
 			this.touchedByFlood[2] = true;
 			return;
 		}
-		else if(y > 15){
+		else if(y < 0){
 			++this.touchedByFloodCount;
 			this.touchedByFlood[3] = true;
 			return;
